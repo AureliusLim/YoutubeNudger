@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "YouTube Reminder",
+    "version": "1.0",
+    "description": "A reminder to stay focused on your tasks while using YouTube.",
+    "permissions": ["tabs"],
+    "content_scripts": [
+      {
+        "matches": ["https://www.youtube.com/*"],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
