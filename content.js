@@ -36,7 +36,6 @@ const styleTag = document.createElement('style');
 styleTag.innerHTML = styles;
 document.head.appendChild(styleTag);
 
-
 let interval = 20; // minutes
 let limit = 3;
 let counter = 0;
@@ -66,25 +65,24 @@ function showInitialPrompt() {
   function submitPrompt() {
     task = document.getElementById("promptInput").value;
     interval = document.getElementById("intervalInput").value;
-    console.log(task)
-    console.log(interval)
-    // document.getElementById("promptText").innerHTML = task;
+    console.log(task);
+    console.log(interval);
     document.querySelector(".modal-header").innerHTML = task;
     promptmodal.style.display = "none";
 
     localStorage.setItem('interval', interval);
     localStorage.setItem('counter', counter);
 
-    if (youtubePlayer){
-      youtubePlayer.playVideo()
+    if (youtubePlayer) {
+      youtubePlayer.playVideo();
       youtubePlayer.addEventListener('onStateChange', onPlayerStateChange);
     }
 
-    showTimeUpModal()
-    delayedAction()
+    showTimeUpModal();
+    delayedAction();
   }
 
-  document.addEventListener('click', function(event) {
+  document.addEventListener('click', function (event) {
     if (event.target && event.target.classList.contains('submitBtn')) {
       submitPrompt();
     }
@@ -93,12 +91,12 @@ function showInitialPrompt() {
 
 function showTimeUpModal() {
   modal = document.createElement("div");
-  modal.style.display = "none"
+  modal.style.display = "none";
 
   modal.classList.add("modal-container");
   modal.innerHTML = `
     <div class="modal">
-      <div class="modal-header">Time's Up! Would you like to extend? (New Timer is ${interval/2} minutes)</div>
+      <div class="modal-header">Time's Up! Would you like to extend? (New Timer is ${interval / 2} minutes)</div>
       <div class="modal-buttons">
         <button id="continueBtn">Continue Browsing</button>
         <button class="cancelBtn">Exit Youtube</button>
@@ -106,8 +104,8 @@ function showTimeUpModal() {
     </div>
   `;
   document.body.appendChild(modal);
-  
-  document.addEventListener('click', function(event) {
+
+  document.addEventListener('click', function (event) {
     if (event.target && event.target.id === 'continueBtn') {
       modal.style.display = "none";
       interval /= 2;
@@ -115,7 +113,7 @@ function showTimeUpModal() {
       localStorage.setItem('counter', counter);
       localStorage.setItem('interval', interval);
       console.log("Add NUMBER:  " + counter);
-      delayedAction(); 
+      delayedAction();
     }
     if (event.target && event.target.classList.contains('cancelBtn')) {
       modal.style.display = "none";
@@ -136,10 +134,6 @@ function showlastPrompt() {
   document.body.appendChild(lastModal);
 }
 
-// function delayedAction() {
-//   setTimeout(action, interval * 1000); // Wait for 'newinterval' seconds before executing action()
-// }
-
 function delayedAction() {
   let secondsRemaining = interval;
 
@@ -156,12 +150,11 @@ function delayedAction() {
   setTimeout(countDown, 1000); // Initial log
 }
 
-
 function action() {
-  if (counter+1 < limit) {
+  if (counter + 1 < limit) {
     modal.classList.add("modal-container");
     const newInterval = interval / 2;
-    if(counter+1 == limit-1){
+    if (counter + 1 == limit - 1) {
       modal.innerHTML = `
       <div class="modal">
         <div class="modal-header">Time's Up! Would you like to extend? This is your Last Extension! (New Timer is ${newInterval} minute/s)</div>
@@ -183,27 +176,56 @@ function action() {
     `;
     }
     modal.style.display = "flex";
-    } else {
-      showlastPrompt()
-      setTimeout(end, 3000);
+  } else {
+    showlastPrompt();
+    setTimeout(end, 3000);
   }
 }
 
-function end(){
+function end() {
   lastModal.style.display = "none";
-  location.href = "https://www.google.com/"
+  location.href = "https://www.google.com/";
 }
 
+// Event listener for when the YouTube player is ready
+function onPlayerReady(event) {
+  console.log("READY PLAYER");
+  // Pause the YouTube player initially
+  event.target.pauseVideo();
 
-function onPlayerStateChange(event) {
+  // Check the player state at a fixed interval
+  const checkPlayerInterval = setInterval(() => {
+    checkPlayerState();
+  }, 1000); // Check every 1000 milliseconds (1 second)
+
+  // Store the interval ID so that it can be cleared if needed
+  event.target.checkPlayerInterval = checkPlayerInterval;
+}
+
+// Function to check the player state
+function checkPlayerState() {
   // Check if the player is playing
-  if (event.data === YT.PlayerState.PLAYING) {
+  if (youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
     // Pause the YouTube player when the modal is displayed
-    if (modal && modal.style.display === "flex") {
+    if (modal.style.display === "flex" || promptmodal.style.display === "flex" || lastModal.style.display === "flex") {
       youtubePlayer.pauseVideo();
+    }
+  } else if (youtubePlayer.getPlayerState() === YT.PlayerState.PAUSED) {
+    // Resume the YouTube player when the modal is closed
+    if (modal.style.display !== "flex" && promptmodal.style.display !== "flex" && lastModal.style.display !== "flex") {
+      youtubePlayer.playVideo();
     }
   }
 }
+
+// Clear the interval when the modal is closed or when needed
+function clearPlayerCheckInterval() {
+  if (youtubePlayer.checkPlayerInterval) {
+    clearInterval(youtubePlayer.checkPlayerInterval);
+  }
+}
+
+
 
 
 window.addEventListener('load', function () {
@@ -223,34 +245,4 @@ window.addEventListener('load', function () {
   }
 });
 
-
-
-// Load the YouTube IFrame API after DOM content has loaded
-document.addEventListener('DOMContentLoaded', function () {
-  // Create a meta tag for Content Security Policy
-  const cspMeta = document.createElement('meta');
-  cspMeta.httpEquiv = 'Content-Security-Policy';
-  cspMeta.content = "script-src 'self' 'wasm-unsafe-eval' 'inline-speculation-rules' http://localhost:* http://127.0.0.1:* https://www.youtube.com;";
-  
-  // Append the meta tag to the head of the document
-  document.head.appendChild(cspMeta);
-
-  // Load the YouTube IFrame API script
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  const firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-});
-
-// // Event listener for when the YouTube player is ready
-function onPlayerReady(event) {
-
-  console.log("READY PLAYER")
-  // Pause the YouTube player initially
-  event.target.pauseVideo();
-  
-  // Store the YouTube player in the global variable
-  youtubePlayer = event.target;
-
-  youtubePlayer.addEventListener('onStateChange', onPlayerStateChange);
-}
+// Load the YouTube I
