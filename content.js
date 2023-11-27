@@ -1,13 +1,15 @@
-// Set the default interval and limit values
+
 let interval = 20; // minutes
 let limit = 3;
- let counter = 0;
+let counter = 0;
 let modal;
 let promptmodal;
 let reminderInterval;
 let task;
+let youtubePlayer;
+
 // Function to show the "What were you supposed to do?" modal
-function showPromptModal() {
+function showInitialPrompt() {
   promptmodal = document.createElement("div");
   promptmodal.style.position = "fixed";
   promptmodal.style.top = "0";
@@ -31,6 +33,11 @@ function showPromptModal() {
   `;
   document.body.appendChild(promptmodal);
 
+  // Pause the YouTube player when the prompt modal is displayed
+  if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+    youtubePlayer.pauseVideo();
+  }
+
   function submitPrompt() {
     task = document.getElementById("promptInput").value;
     interval = document.getElementById("intervalInput").value;
@@ -39,6 +46,10 @@ function showPromptModal() {
     document.getElementById("promptText").innerHTML = task;
     promptmodal.style.display = "none";
     localStorage.setItem('counter', counter);
+
+    if (youtubePlayer){
+      youtubePlayer.playVideo()
+    }
   }
 
   document.addEventListener('click', function(event) {
@@ -48,61 +59,122 @@ function showPromptModal() {
   });
 }
 
-
-modal = document.createElement("div");
-modal.style.position = "fixed";
-modal.style.top = "0";
-modal.style.display = "none"
-modal.style.left = "0";
-modal.style.width = "100%";
-modal.style.height = "100%";
-modal.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-modal.style.zIndex = "9999";
-modal.innerHTML = `
-    <div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; text-align: center;'>
-    <div id="promptText"></div>
-    <div class="modal-buttons">
-        <button id="continueBtn">Continue Browsing</button>
-        <button class="cancelBtn">Cancel</button>
-    </div>
-    </div>
-`;
-document.body.appendChild(modal);
-
-function delayedAction() {
-  setTimeout(action, newinterval * 1000); // Wait for 'newinterval' seconds before executing action()
+function showTimeUpModal() {
+  modal = document.createElement("div");
+  modal.style.position = "fixed";
+  modal.style.top = "0";
+  modal.style.display = "none"
+  modal.style.left = "0";
+  modal.style.width = "100%";
+  modal.style.height = "100%";
+  modal.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+  modal.style.zIndex = "9999";
+  modal.innerHTML = `
+      <div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 10px; text-align: center;'>
+        <div id="promptText"></div>
+        <div class="modal-buttons">
+            <button id="continueBtn">Continue Browsing</button>
+            <button class="cancelBtn">Stop Youtube</button>
+        </div>
+      </div>
+  `;
+  document.body.appendChild(modal);
+  
+  document.addEventListener('click', function(event) {
+    if (event.target && event.target.id === 'continueBtn') {
+      modal.style.display = "none";
+      counter++;
+      localStorage.setItem('counter', counter);
+      console.log(counter);
+      delayedAction(); 
+    }
+    if (event.target && event.target.classList.contains('cancelBtn')) {
+      modal.style.display = "none";
+      counter = 99;
+      location.href = "https://www.google.com/";
+    }
+  });
 }
 
-function action() {
-  if (counter < limit) {
-    modal.style.display = "flex";
-    newinterval /= 2;
-    console.log(newinterval);
-    delayedAction(); // Trigger next action after 'newinterval' seconds
-  } else {
-    location.href = "https://www.google.com/";
+
+
+// Check if the current page is a YouTube video page
+function isYouTubePage() {
+  return window.location.hostname === "www.youtube.com";
+}
+
+// Function to show the initial prompt when YouTube is opened
+function showInitialPromptOnYouTube() {
+  if (isYouTubePage()) {
+    showInitialPrompt();
   }
 }
 
-showPromptModal(); 
+// Event listener to check when the YouTube player is ready
+document.addEventListener("DOMContentLoaded", function () {
+  // Assuming you have a function to initialize the YouTube player, replace 'initializeYouTubePlayer' with the actual function name
+  initializeYouTubePlayer();
 
-document.addEventListener('click', function(event) {
-  if (event.target && event.target.id === 'continueBtn') {
-    modal.style.display = "none";
-    counter++;
-    localStorage.setItem('counter', counter);
-    console.log(counter);
-    delayedAction(); 
-  }
-  if (event.target && event.target.classList.contains('cancelBtn')) {
-    modal.style.display = "none";
-    counter = 99;
-    location.href = "https://www.google.com/";
-  }
+  // Show the initial prompt when YouTube is opened
+  showInitialPromptOnYouTube();
 });
-let newinterval = interval;
-// Initial call to delayed action
-delayedAction();
 
-// var newinterval = interval
-// reminderInterval = setInterval(action(), newinterval * 1 * 1000); // modify this from times 60 to times 1 so it will be 10 seconds instead of 10 minutes
+
+
+
+
+// // Function to initialize the reminder system
+// function initializeReminderSystem() {
+//   let newinterval = interval;
+//   delayedAction();
+// }
+
+// // Event listener for when the YouTube player is ready
+// function onPlayerReady(event) {
+//   // Pause the YouTube player initially
+//   event.target.pauseVideo();
+  
+//   // Store the YouTube player in the global variable
+//   youtubePlayer = event.target;
+//   showInitialPrompt();
+// }
+
+// function delayedAction() {
+//   setTimeout(action, newinterval * 1000); // Wait for 'newinterval' seconds before executing action()
+// }
+
+
+// function action() {
+//   if (counter < limit) {
+//     modal.style.display = "flex";
+//     newinterval /= 2;
+//     console.log(newinterval);
+//     delayedAction(); // Trigger next action after 'newinterval' seconds
+//   } else {
+//     location.href = "https://www.google.com/";
+//   }
+// }
+
+// showInitialPrompt(); 
+
+//   let newinterval = interval;
+//   delayedAction();
+
+// // Load the YouTube IFrame API after DOM content has loaded
+// document.addEventListener('DOMContentLoaded', function () {
+//   // Create a meta tag for Content Security Policy
+//   const cspMeta = document.createElement('meta');
+//   cspMeta.httpEquiv = 'Content-Security-Policy';
+//   cspMeta.content = "script-src 'self' 'wasm-unsafe-eval' 'inline-speculation-rules' http://localhost:* http://127.0.0.1:* https://www.youtube.com;";
+  
+//   // Append the meta tag to the head of the document
+//   document.head.appendChild(cspMeta);
+
+//   // Load the YouTube IFrame API script
+//   const tag = document.createElement('script');
+//   tag.src = 'https://www.youtube.com/iframe_api';
+//   const firstScriptTag = document.getElementsByTagName('script')[0];
+//   firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+// });
+
+// delayedAction();
