@@ -110,14 +110,36 @@ function showInitialPromptOnYouTube() {
   }
 }
 
-// Event listener to check when the YouTube player is ready
-document.addEventListener("DOMContentLoaded", function () {
-  // Assuming you have a function to initialize the YouTube player, replace 'initializeYouTubePlayer' with the actual function name
-  initializeYouTubePlayer();
+function logInputValues() {
+  console.log("Task:", task);
+  console.log("Interval:", interval);
+  console.log("Counter:", counter);
+}
 
+window.addEventListener('beforeunload', function () {
+  logInputValues(task, interval, counter);
+});
+
+window.onload = function () {
+  logInputValues(task, interval, counter);
   // Show the initial prompt when YouTube is opened
   showInitialPromptOnYouTube();
-});
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
