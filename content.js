@@ -60,6 +60,7 @@ function showInitialPrompt() {
       </div>
     </div>
   `;
+  promptmodal.classList.add("modal-open");
   document.body.appendChild(promptmodal);
 
   function submitPrompt() {
@@ -69,7 +70,7 @@ function showInitialPrompt() {
     console.log(interval);
     document.querySelector(".modal-header").innerHTML = task;
     promptmodal.style.display = "none";
-
+    promptmodal.classList.remove("modal-open");
     localStorage.setItem('interval', interval);
     localStorage.setItem('counter', counter);
 
@@ -103,11 +104,13 @@ function showTimeUpModal() {
       </div>
     </div>
   `;
+  modal.classList.add("modal-open");
   document.body.appendChild(modal);
 
   document.addEventListener('click', function (event) {
     if (event.target && event.target.id === 'continueBtn') {
       modal.style.display = "none";
+      modal.classList.remove("modal-open");
       interval /= 2;
       counter++;
       localStorage.setItem('counter', counter);
@@ -131,6 +134,7 @@ function showlastPrompt() {
       <div class="modal-header">Your Time is Up !! Exiting Youtube</div>
     </div>
   `;
+  lastModal.classList.add("modal-open");
   document.body.appendChild(lastModal);
 }
 
@@ -187,46 +191,58 @@ function end() {
   location.href = "https://www.google.com/";
 }
 
-// Event listener for when the YouTube player is ready
+
+
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    height: '360',
+    width: '640',
+    videoId: 'YOUR_VIDEO_ID', // Replace with your actual YouTube video ID
+    events: {
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange
+    }
+  });
+}
+
 function onPlayerReady(event) {
-  console.log("READY PLAYER");
-  // Pause the YouTube player initially
-  event.target.pauseVideo();
-
-  // Check the player state at a fixed interval
-  const checkPlayerInterval = setInterval(() => {
-    checkPlayerState();
-  }, 1000); // Check every 1000 milliseconds (1 second)
-
-  // Store the interval ID so that it can be cleared if needed
-  event.target.checkPlayerInterval = checkPlayerInterval;
+  // Start checking modal status asynchronously
+  console.log("checking");
+  modalCheckInterval = setInterval(checkModalStatus(event), 1000);
 }
 
-// Function to check the player state
-function checkPlayerState() {
-  // Check if the player is playing
-  if (youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-    // Pause the YouTube player when the modal is displayed
-    if (modal.style.display === "flex" || promptmodal.style.display === "flex" || lastModal.style.display === "flex") {
-      youtubePlayer.pauseVideo();
-    }
-  } else if (youtubePlayer.getPlayerState() === YT.PlayerState.PAUSED) {
-    // Resume the YouTube player when the modal is closed
-    if (modal.style.display !== "flex" && promptmodal.style.display !== "flex" && lastModal.style.display !== "flex") {
-      youtubePlayer.playVideo();
-    }
+// Function called when YouTube player state changes
+function onPlayerStateChange(event) {
+  // You can handle player state changes if needed
+}
+
+// Function to check if the modal is open
+function isModalOpen() {
+  const modal = document.getElementById('modal');
+  return modal.style.display !== 'none';
+}
+
+// Function to check modal status and pause/resume the YouTube player accordingly
+function checkModalStatus() {
+  const modals = [modal, promptmodal, lastModal];
+
+  const isOpen = modals.some(modal => modal.classList.contains('modal-open'));
+
+  if (isOpen) {
+    player.pauseVideo(); // Pause the YouTube player
+  } else {
+    player.playVideo(); // Resume the YouTube player
   }
+  onPlayerReady();
 }
 
-// Clear the interval when the modal is closed or when needed
-function clearPlayerCheckInterval() {
-  if (youtubePlayer.checkPlayerInterval) {
-    clearInterval(youtubePlayer.checkPlayerInterval);
-  }
-}
-
-
-
+// Load YouTube API when the page is ready
+document.addEventListener('DOMContentLoaded', () => {
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  const firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+});
 
 window.addEventListener('load', function () {
   // Check if the current page is under YouTube
@@ -237,7 +253,8 @@ window.addEventListener('load', function () {
     if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
       youtubePlayer.pauseVideo();
     }
-
+    
+    onPlayerReady(event);
     showInitialPrompt();
   } else {
     // The current page is not on YouTube
