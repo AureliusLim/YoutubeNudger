@@ -185,7 +185,7 @@ function action() {
     modal.style.display = "flex";
     } else {
       showlastPrompt()
-      setTimeout(end, 3000);
+      setTimeout(end, 2000);
   }
 }
 
