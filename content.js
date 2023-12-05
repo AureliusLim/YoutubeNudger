@@ -55,7 +55,7 @@ function showInitialPrompt() {
     <div class="modal">
       <div class="modal-header">Set your reminder</div>
       <input type="text" id="promptInput" placeholder="Enter your reminder" required>
-      <input type="text" id="intervalInput" placeholder="Set interval (minutes)" required>
+      <input type="text" id="intervalInput" placeholder="Set interval (seconds)" required>
       <div class="modal-buttons">
         <button class="submitBtn">Submit</button>
       </div>
@@ -98,7 +98,7 @@ function showTimeUpModal() {
   modal.classList.add("modal-container");
   modal.innerHTML = `
     <div class="modal">
-      <div class="modal-header">Time's Up! Would you like to extend? (New Timer is ${interval/2} minutes)</div>
+      <div class="modal-header">Time's Up! Remember you have to do: ${task} Would you like to extend? (New Timer is ${interval/2} minutes)</div>
       <div class="modal-buttons">
         <button id="continueBtn">Continue Browsing</button>
         <button class="cancelBtn">Exit Youtube</button>
@@ -164,7 +164,7 @@ function action() {
     if(counter+1 == limit-1){
       modal.innerHTML = `
       <div class="modal">
-        <div class="modal-header">Time's Up! Would you like to extend? This is your Last Extension! (New Timer is ${newInterval} minute/s)</div>
+        <div class="modal-header">Time's Up! Remember you have to do: ${task}. Would you like to extend? This is your Last Extension! (New Timer is ${newInterval} minute/s)</div>
         <div class="modal-buttons">
           <button id="continueBtn">Continue Browsing</button>
           <button class="cancelBtn">Exit Youtube</button>
@@ -174,7 +174,7 @@ function action() {
     } else {
       modal.innerHTML = `
       <div class="modal">
-        <div class="modal-header">Time's Up! Would you like to extend? (New Timer is ${newInterval} minute/s)</div>
+        <div class="modal-header">Time's Up! Remember you have to do: ${task}. Would you like to extend? (New Timer is ${newInterval} minute/s)</div>
         <div class="modal-buttons">
           <button id="continueBtn">Continue Browsing</button>
           <button class="cancelBtn">Exit Youtube</button>
