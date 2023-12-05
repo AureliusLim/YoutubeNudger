@@ -130,7 +130,7 @@ function showlastPrompt() {
   lastModal.classList.add("modal-container");
   lastModal.innerHTML = `
     <div class="modal">
-      <div class="modal-header">Your Time is Up !! Exiting Youtube</div>
+      <div class="modal-header">Your Time is Up !! Remember you have to do: ${task}. Exiting Youtube</div>
     </div>
   `;
   document.body.appendChild(lastModal);
