@@ -20,7 +20,7 @@ To install the extension, follow these steps:
 
 ## Usage
 
-To use the extension, simply navigate to YouTube and start watching any video. You will see a modal asking you to enter your task and interval. Enter the details and click on Submit. The modal will disappear and you can enjoy your video. After the interval, the modal will reappear and you can choose to continue browsing or exit YouTube. The extension will keep track of your extensions and kick you out of YouTube after the limit.
+To use the extension, simply open Youtube. You will see a modal asking you to enter your task and interval. Enter the details and click on Submit. The modal will disappear and you can enjoy your video. After the interval, the modal will reappear and you can choose to continue browsing or exit YouTube. The extension will keep track of your extensions and kick you out of YouTube after the limit.
 
 ## Developers
 
