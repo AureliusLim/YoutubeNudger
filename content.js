@@ -55,7 +55,7 @@ function showInitialPrompt() {
     <div class="modal">
       <div class="modal-header">Set your reminder</div>
       <input type="text" id="promptInput" placeholder="Enter your reminder" required>
-      <input type="text" id="intervalInput" placeholder="Set interval (seconds)" required>
+      <input type="text" id="intervalInput" placeholder="Set interval (minutes)" required>
       <div class="modal-buttons">
         <button class="submitBtn">Submit</button>
       </div>
@@ -66,6 +66,7 @@ function showInitialPrompt() {
   function submitPrompt() {
     task = document.getElementById("promptInput").value;
     interval = document.getElementById("intervalInput").value;
+    interval = interval * 60
     console.log(task)
     console.log(interval)
     // document.getElementById("promptText").innerHTML = task;
@@ -98,7 +99,7 @@ function showTimeUpModal() {
   modal.classList.add("modal-container");
   modal.innerHTML = `
     <div class="modal">
-      <div class="modal-header">Time's Up! Remember you have to do: ${task} Would you like to extend? (New Timer is ${interval/2} minutes)</div>
+      <div class="modal-header">Time's Up! Remember you have to do: ${task};  Would you like to extend? (New Timer is ${interval/2} second/s)</div>
       <div class="modal-buttons">
         <button id="continueBtn">Continue Browsing</button>
         <button class="cancelBtn">Exit Youtube</button>
@@ -130,19 +131,14 @@ function showlastPrompt() {
   lastModal.classList.add("modal-container");
   lastModal.innerHTML = `
     <div class="modal">
-      <div class="modal-header">Your Time is Up !! Remember you have to do: ${task}. Exiting Youtube</div>
+      <div class="modal-header">Your Time is Up !! Remember you have to do: ${task};  Exiting Youtube</div>
     </div>
   `;
   document.body.appendChild(lastModal);
 }
 
-// function delayedAction() {
-//   setTimeout(action, interval * 1000); // Wait for 'newinterval' seconds before executing action()
-// }
-
 function delayedAction() {
   let secondsRemaining = interval;
-
   function countDown() {
     if (secondsRemaining > 0) {
       console.log(`Seconds remaining: ${secondsRemaining}`);
@@ -164,7 +160,7 @@ function action() {
     if(counter+1 == limit-1){
       modal.innerHTML = `
       <div class="modal">
-        <div class="modal-header">Time's Up! Remember you have to do: ${task}. Would you like to extend? This is your Last Extension! (New Timer is ${newInterval} minute/s)</div>
+        <div class="modal-header">Time's Up! Remember you have to do: ${task};   Would you like to extend? This is your Last Extension! (New Timer is ${newInterval} seconds/s)</div>
         <div class="modal-buttons">
           <button id="continueBtn">Continue Browsing</button>
           <button class="cancelBtn">Exit Youtube</button>
@@ -174,7 +170,7 @@ function action() {
     } else {
       modal.innerHTML = `
       <div class="modal">
-        <div class="modal-header">Time's Up! Remember you have to do: ${task}. Would you like to extend? (New Timer is ${newInterval} minute/s)</div>
+        <div class="modal-header">Time's Up! Remember you have to do: ${task};   Would you like to extend? (New Timer is ${newInterval} seconds/s)</div>
         <div class="modal-buttons">
           <button id="continueBtn">Continue Browsing</button>
           <button class="cancelBtn">Exit Youtube</button>
